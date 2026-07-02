@@ -1,42 +1,66 @@
-import Header from "./components/Header"
-import Chatbox from "./components/Chatbox"
+import Header from "./components/Header";
+import Chatbox from "./components/Chatbox";
 import Chatinput from "./components/Chatinput";
 import { useState } from "react";
-import { getAIResponce } from "./service/aiService";
+import { sendMessage } from "./api/chat";
 
-function  App(){
-  const [message, setMessage] = useState([
-    {
-      sender:"AI",
-      text:"Hello! I'm your shl assistant"
-    }
-  ]);
+function App() {
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState([]);
 
-
-
-  const addMessage=(text) => {
+  const addMessage = async (text) => {
     const userMessage = {
-      sender:"You",
+      sender: "You",
       text: text,
-    }
+    };
 
-    const reply = getAIResponce(text);
-    setMessage(prev => [...message,userMessage]);
-    setTimeout(() => {
+    setMessages((prev) => [...prev, userMessage]);
+    setLoading(true);
+
+    try {
+      const response = await sendMessage(text);
+
       const aiMessage = {
-          sender:"AI",
-          text:reply
-      }
-      setMessage(prev => [...prev,aiMessage])
-    },1000)
-  }
+        sender: "AI",
+        text: response.reply,
+        recommendations: response.recommendations,
+      };
 
-  return(
-    <>
-    <Header/>
-    <Chatbox messages={message}/>
-    <Chatinput addMessage={addMessage}/>
-    </>
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "AI",
+          text: "Something went wrong. Please try again.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="app-shell">
+      <div className="floating-orb floating-orb--1" aria-hidden="true" />
+      <div className="floating-orb floating-orb--2" aria-hidden="true" />
+      <div className="floating-orb floating-orb--3" aria-hidden="true" />
+
+      <div className="particles" aria-hidden="true">
+        <span className="particle particle--1" />
+        <span className="particle particle--2" />
+        <span className="particle particle--3" />
+        <span className="particle particle--4" />
+        <span className="particle particle--5" />
+        <span className="particle particle--6" />
+      </div>
+
+      <div className="app">
+        <Header />
+        <Chatbox messages={messages} loading={loading} onSuggestion={addMessage} />
+        <Chatinput addMessage={addMessage} loading={loading} />
+      </div>
+    </div>
   );
 }
 
