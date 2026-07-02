@@ -121,6 +121,64 @@ Do not invent any SHL assessment details.
 Be concise and professional.
 """
 
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+
+    except Exception as e:
+        print("Gemini Compare Error:", e)
+
+        return f"""
+Comparison of SHL Assessments
+
+Assessment 1
+- {assessment1['name']}
+
+Assessment 2
+- {assessment2['name']}
+
+The Gemini API quota has been exceeded, so an AI-generated comparison is temporarily unavailable.
+
+You can still compare these assessments by reviewing:
+- Their descriptions
+- Their categories
+- Their SHL product pages
+"""
+
+    prompt = f"""
+You are an SHL Assessment Expert.
+
+Compare these two SHL assessments.
+
+Assessment 1
+
+Name: {assessment1['name']}
+
+Description: {assessment1['description']}
+
+Categories: {', '.join(assessment1['keys'])}
+
+Assessment 2
+
+Name: {assessment2['name']}
+
+Description: {assessment2['description']}
+
+Categories: {', '.join(assessment2['keys'])}
+
+Compare them using:
+
+1. Purpose
+2. Skills Measured
+3. Best Use Cases
+4. Strengths
+5. Which assessment would you recommend and why?
+
+Use only the information provided.
+Do not invent any SHL assessment details.
+Be concise and professional.
+"""
+
     response = model.generate_content(prompt)
 
     return response.text
