@@ -3,14 +3,27 @@ import json
 CATALOG = None
 
 
+import json
+from pathlib import Path
+
+CATALOG = None
+
+
 def load_catalog():
     global CATALOG
 
     if CATALOG is None:
-        with open("data/shl_catalog.json", "r", encoding="utf-8") as f:
+        catalog_path = (
+            Path(__file__).resolve().parent.parent
+            / "Data"
+            / "shl_catalog.json"
+        )
+
+        with open(catalog_path, "r", encoding="utf-8") as f:
             CATALOG = json.load(f)
 
     return CATALOG
+    
 
 
 def search_catalog(keywords):
